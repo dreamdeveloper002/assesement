@@ -7,6 +7,11 @@ const orderSchema = mongoose.Schema({
      required: true,
      ref: 'User'
   },
+
+  courier: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Courier'
+ },
   customerEmail: {
     type: String, 
     required: true, 

@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs';
 
 
-const userSchema = mongoose.Schema({
+const courierSchema = mongoose.Schema({
   firstName: { 
     type: String, 
     required: true,
@@ -32,16 +32,60 @@ const userSchema = mongoose.Schema({
     required: true, 
     minlength: 6 
   },
-  isAdmin: {
+
+  verified: { 
     type: Boolean,
-    require: true,
+    required: true, 
     default: false
   },
-  isDispatcher: {
+
+  availabilityStatus: {
     type: Boolean,
-    require: true,
-    default: false
+    default: true,
+    required: true,
+    select: false,
   },
+
+  ordersToDeliver: [{
+    orderId: {
+      type: String,
+      required: true
+    },
+    allocatedDispatcherId: {
+      type: String,
+      required: true
+    },
+    orderStatus: {
+      type: String,
+      require: true,
+      enum: ['pending', 'delivered'],
+      default: 'pending'
+    }
+  }],
+  
+  address: {
+    type: String,
+    required: [true, 'Please add an address']
+  },
+
+  location: {
+    // GeoJSON Point
+    type: {
+      type: String,
+      enum: ['Point']
+    },
+    coordinates: {
+      type: [Number],
+      index: '2dsphere'
+    },
+    formattedAddress: String,
+    street: String,
+    city: String,
+    state: String,
+    zipcode: String,
+    country: String
+  },
+
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 }, {
@@ -49,13 +93,13 @@ const userSchema = mongoose.Schema({
 })
 
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
+courierSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 };
   
 
   //Generate and hash password token
-UserSchema.methods.getResetPasswordToken = function () {
+  courierSchema.methods.getResetPasswordToken = function () {
    // Generate token
 
    const resetToken = crypto.randomBytes(20).toString('hex');
@@ -69,7 +113,7 @@ UserSchema.methods.getResetPasswordToken = function () {
    return resetToken;
 }
 
-userSchema.pre('save', async function (next) {
+courierSchema.pre('save', async function (next) {
 
    if(!this.isModified('password')) {
        next()
@@ -80,7 +124,7 @@ userSchema.pre('save', async function (next) {
 })
 
 
-const User = mongoose.model('User', userSchema)
+const Courier = mongoose.model('Courier', courierSchema)
 
 
-export default User
+export default Courier

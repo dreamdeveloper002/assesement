@@ -2,6 +2,8 @@
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js'
 import User from '../models/userModel.js';
+import sendEmail from '../utils/sendEmail';
+const crypto = require('crypto');
 
 
 
@@ -17,11 +19,12 @@ const authUser =  asyncHandler(async (req, res) => {
    if( user && (await user.matchPassword(password))) {
        res.json ({
           _id : user._id,
-          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email, 
           phone: user.phone,
           isAdmin: user.isAdmin,
-          isCourier: user.isCourier,
+          isDispatcher: user.isDispatcher,
           token: generateToken(user._id)
        });
    } else {
@@ -64,7 +67,7 @@ const registerUser =  asyncHandler(async (req, res) => {
          phone: user.phone,
          email: user.email, 
          isAdmin: user.isAdmin,
-         isCourier: user.isCourier,
+         isDispatcher: user.isDispatcher,
          token: generateToken(user._id)
        })
     } else {
@@ -228,6 +231,82 @@ const updateUser =  asyncHandler(async (req, res) => {
   }); 
 
 
+
+//@desc   Forgot password
+//@route  POST  /api/v1/auth/forgotpassword
+//@access Public
+const forgotPassword =  asyncHandler(async (req, res) => {
+  
+   const user = await User.findById({ email: req.body.email});
+
+   if(!user) {
+      res.status(404);
+      throw new Error('User not found')
+   };
+
+   //Get reset token
+  const resetToken = user.getResetPasswordToken();
+
+
+// Create reset url
+ const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
+
+
+ const message = `You are receiving this email because you have request for a password reset, please make a PUT request to: \n\n ${resetUrl}`;
+
+  await user.save({ validateBeforeSave: false });
+
+
+ await sendEmail({
+   email: user.email,
+   subject: 'Password reset token',
+   message
+ });
+
+
+ return res.status(200).json({ success: true, data: 'Email sent'});
+   
+ 
+   
+}); 
+
+
+//@desc       Reset password
+//@route      PUT /api/v1/auth/resetpassword/:resettoken
+//@access     Public
+const resetPassword =  asyncHandler(async (req, res) => {
+  
+  // Get hashed token
+  const resetPasswordToken = crypto
+  .createHash('sha256')
+  .update(req.params.resettoken)
+  .digest('hex');
+
+  const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+  });
+
+
+  if(!user) {
+   res.status(404);
+   throw new Error('User not found')
+};
+
+    //Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    
+    const updatedUser = await user.save(); 
+    
+    res.json({
+      user: updateUser,
+      token: generateToken(updatedUser._id)
+   })
+   
+}); 
+
 export {
    authUser,
    getUserProfile,
@@ -236,5 +315,7 @@ export {
    deleteUser,
    getUserByID,
    getUsers,
-   updateUser
+   updateUser,
+   forgotPassword,
+   resetPassword
 }
