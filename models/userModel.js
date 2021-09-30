@@ -55,7 +55,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   
 
   //Generate and hash password token
-UserSchema.methods.getResetPasswordToken = function () {
+userSchema.methods.getResetPasswordToken = function () {
    // Generate token
 
    const resetToken = crypto.randomBytes(20).toString('hex');
