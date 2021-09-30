@@ -1,7 +1,6 @@
 import path from 'path'
 import express from 'express';
 import morgan from 'morgan';
-import express from 'express';
 import helmet from 'helmet';
 import mongoSanitize from "express-mongo-sanitize";
 import xss from 'xss-clean';

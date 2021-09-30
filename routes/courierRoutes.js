@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 
 
-import { courier, registerCourier } from "../controller/courierContoller";
+import { courier, registerCourier } from "../controller/courierContoller.js";
 
 
 
