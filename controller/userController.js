@@ -2,7 +2,7 @@
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js'
 import User from '../models/userModel.js';
-const sendEmail = require('../utils/sendEmail');
+import { sendEmail } from '../utils/sendEmail.js';
 const crypto = require('crypto');
 
 
