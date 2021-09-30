@@ -3,6 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit'
 import mongoSanitize from "express-mongo-sanitize";
 import xss from 'xss-clean';
 import hpp from 'hpp';
