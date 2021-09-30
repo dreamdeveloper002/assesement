@@ -6,12 +6,6 @@ import { authUser, getUserProfile, registerUser, updateUserProfile, getUsers, de
 import { protect, admin } from '../middleware/authMiddleware.js'
 
 
-router.get('/', (req, res) => {
-      res.json({
-            message: 'WELCOME HOME'
-      })
-})
-
 router.route('/login')
       .post(authUser);
 

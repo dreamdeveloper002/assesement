@@ -24,6 +24,13 @@ connectDB()
  
 const app = express();
 
+
+app.get('/', (req, res) => {
+    res.json({
+          message: 'WELCOME HOME'
+    })
+})
+
 app.use(express.json());
 
 
