@@ -14,4 +14,4 @@ router.route('/register')
       .post(registerCourier)
     
 
-      
+  export default router
