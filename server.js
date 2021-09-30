@@ -1,6 +1,12 @@
 import path from 'path'
 import express from 'express';
-import dotenv from 'dotenv';
+import morgan from 'morgan';
+import express from 'express';
+import helmet from 'helmet';
+import mongoSanitize from "express-mongo-sanitize";
+import xss from 'xss-clean';
+import hpp from 'hpp';
+import cors from 'cors';
 import colors from 'colors'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
@@ -18,6 +24,40 @@ connectDB()
 const app = express();
 
 app.use(express.json());
+
+
+//Dev logging middleware
+if(process.env.NODE_ENV === 'development') {
+    
+    app.use(morgan('dev'));
+
+}
+
+
+//sanitize data
+app.use(mongoSanitize());
+
+// Set security headers
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(xss());
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, //10mins
+    max: 100
+})
+
+app.use(limiter);
+
+
+// prevent http param pollution
+app.use(hpp());
+
+//Enable CORS
+app.use(cors());
+
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
