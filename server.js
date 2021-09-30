@@ -1,5 +1,6 @@
 import path from 'path'
 import express from 'express';
+import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import mongoSanitize from "express-mongo-sanitize";
