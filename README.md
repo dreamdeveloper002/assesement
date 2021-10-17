@@ -7,7 +7,7 @@ NODE_ENV=development
 
 PORT=5000
 
-MONGO_URI=<your mongodb uri>
+MONGO_URI=**your mongodb uri**
 
 JWT_SECRET=
 
